@@ -21,7 +21,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST["username"])) {
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
-   
+  
+}
+if(!empty($username)){
+// SQL query to count all users
+	$sql = "SELECT COUNT(*) AS userCount FROM users";
+	$result = $conn->query($sql);
+
+	$userCount = 0;
+	if ($result) {
+    		$row = $result->fetch_assoc();
+    		$userCount = $row['userCount'];
+    		echo"<br><p>total active users, $userCount</p>";
+	}
 
 }
 
