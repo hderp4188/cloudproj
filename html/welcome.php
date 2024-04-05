@@ -13,14 +13,16 @@ if ($conn->connect_error) {
 // Insert username into the database
 if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST["username"])) {
     $username = $conn->real_escape_string($_POST["username"]);
-
-    $sql = "INSERT INTO users (username) VALUES ('$username')";
-
+	// Check if the username already exists
+  
+ 	$sql = "INSERT INTO users (username) VALUES ('$username')";
     if ($conn->query($sql) === TRUE) {
         echo "<p>Welcome, $username! Start chatting.</p>";
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
+   
+
 }
 
 $conn->close();
