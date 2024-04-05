@@ -1,4 +1,3 @@
-
 <?php
 include_once("/var/www/inc/dbinfo.inc");
 
@@ -44,9 +43,47 @@ $conn->close();
 <html>
 <head>
     <title>Welcome</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    function updateUserCount() {
+        $.get("get_user_count.php", function(data) {
+            $("#userCount").text(data + " users online");
+            setTimeout(updateUserCount, 5000); // Update every 5 seconds
+        });
+    }
+    $(document).ready(function() {
+        updateUserCount(); // Initial call
+        $("#startChat").click(function() {
+            // Mark the user as ready to chat
+            $.post("mark_ready.php", { username: "<?php echo $username; ?>" }, function(data) {
+                console.log(data); // Log response
+                alert("Waiting for a match...");
+                checkForMatch(); // Begin checking for a match
+            });
+        });
+
+        function checkForMatch() {
+            $.post("check_for_match.php", { username: "<?php echo $username; ?>" }, function(data) {
+                console.log(data); // Log response
+                if (data.includes("Matched")) {
+                    var chatroomId = data.split(": ")[2]; // Assuming the format is "Matched with USERNAME. Chatroom ID: ID"
+                    window.location.href = `chatroom.php?id=${chatroomId}`; // Redirect to chatroom
+                    // alert(data); // Placeholder action
+                } else {
+                    setTimeout(checkForMatch, 3000); // Re-check every 3 seconds
+                }
+            });
+        }
+    });
+</script>
+
 </head>
 <body>
+    <p>Welcome, <?php echo $username; ?>! Start chatting.</p>
+    <!-- Ensure the button has the ID 'startChat' for the jQuery selector -->
+    <div id="userCount">Checking users online...</div>
+    <button id="startChat">Start Chatting</button>
+    <!-- Other HTML content -->
     <button onclick="window.location='delete_user.php?username=<?php echo $username; ?>';">Back</button>
 </body>
 </html>
-
