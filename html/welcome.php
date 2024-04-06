@@ -3,87 +3,81 @@ include_once("/var/www/inc/dbinfo.inc");
 
 // Connect to the database
 $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
-
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Insert username into the database
-if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST["username"])) {
-    $username = $conn->real_escape_string($_POST["username"]);
-	// Check if the username already exists
-  
- 	$sql = "INSERT INTO users (username) VALUES ('$username')";
-    if ($conn->query($sql) === TRUE) {
-        echo "<p>Welcome, $username! Start chatting.</p>";
+$username = $conn->real_escape_string($_POST['username'] ?? '');
+
+// Attempt to find an existing chatroom or create a new one
+$chatroom_id = findOrCreateChatroom($conn, $username);
+
+function findOrCreateChatroom($conn, $username) {
+    // Check for an available chatroom (not full and recent)
+    $sql = "SELECT chatroom_id FROM chat_messages GROUP BY chatroom_id HAVING COUNT(DISTINCT sender) < 2";
+    $result = $conn->query($sql);
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row['chatroom_id']; // Join an existing chatroom
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        // Create a new chatroom ID
+        $newChatroomId = uniqid('chatroom_');
+        return $newChatroomId;
     }
-  
-}
-if(!empty($username)){
-// SQL query to count all users
-	$sql = "SELECT COUNT(*) AS userCount FROM users";
-	$result = $conn->query($sql);
-
-	$userCount = 0;
-	if ($result) {
-    		$row = $result->fetch_assoc();
-    		$userCount = $row['userCount'];
-    		echo"<br><p>total active users, $userCount</p>";
-	}
-
 }
 
-$conn->close();
+// HTML and script for the chat functionality will go here
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Welcome</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-    function updateUserCount() {
-        $.get("get_user_count.php", function(data) {
-            $("#userCount").text(data + " users online");
-            setTimeout(updateUserCount, 5000); // Update every 5 seconds
-        });
-    }
-    $(document).ready(function() {
-        updateUserCount(); // Initial call
-        $("#startChat").click(function() {
-            // Mark the user as ready to chat
-            $.post("mark_ready.php", { username: "<?php echo $username; ?>" }, function(data) {
-                console.log(data); // Log response
-                alert("Waiting for a match...");
-                checkForMatch(); // Begin checking for a match
-            });
-        });
+	// Poll for new messages every 2 seconds
+	setInterval(pollMessages, 2000);
 
-        function checkForMatch() {
-            $.post("check_for_match.php", { username: "<?php echo $username; ?>" }, function(data) {
-                console.log(data); // Log response
-                if (data.includes("Matched")) {
-                    var chatroomId = data.split(": ")[2]; // Assuming the format is "Matched with USERNAME. Chatroom ID: ID"
-                    window.location.href = `chatroom.php?id=${chatroomId}`; // Redirect to chatroom
-                    // alert(data); // Placeholder action
-                } else {
-                    setTimeout(checkForMatch, 3000); // Re-check every 3 seconds
-                }
-            });
-        }
-    });
+	async function pollMessages() {
+    		const chatroom_id = "<?php echo $chatroom_id; ?>";
+    		const response = await fetch('poll_messages.php?chatroom_id=' + chatroom_id);
+    		const messages = await response.json(); // Assuming the response is JSON
+    		displayMessages(messages);
+	}
+
+	function displayMessages(messages) {
+    	const chatWindow = document.getElementById('chatWindow');
+    	chatWindow.innerHTML = ''; // Clear current messages
+    	messages.forEach(message => {
+        	const messageDiv = document.createElement('div');
+        	messageDiv.textContent = `${message.sender}: ${message.message}`;
+        	chatWindow.appendChild(messageDiv);
+    		});
+	}
+
+	async function sendMessage() {
+    	const chatroom_id = "<?php echo $chatroom_id; ?>";
+    	const message = document.getElementById('messageInput').value;
+    	const formData = new FormData();
+    	formData.append('chatroom_id', chatroom_id);
+    	formData.append('message', message);
+    	formData.append('sender', "<?php echo $username; ?>");
+    
+    	await fetch('send_message.php', {
+        	method: 'POST',
+        	body: formData,
+    	});
+
+    	document.getElementById('messageInput').value = ''; // Clear input
+    	pollMessages(); // Immediately poll for the latest messages
+	}
 </script>
 
 </head>
 <body>
-    <p>Welcome, <?php echo $username; ?>! Start chatting.</p>
-    <!-- Ensure the button has the ID 'startChat' for the jQuery selector -->
-    <div id="userCount">Checking users online...</div>
-    <button id="startChat">Start Chatting</button>
-    <!-- Other HTML content -->
+    <div id="chatWindow">
+        <!-- Messages will be displayed here -->
+    </div>
+    <input type="text" id="messageInput" placeholder="Type your message here...">
+    <button onclick="sendMessage()">Send</button>
     <button onclick="window.location='delete_user.php?username=<?php echo $username; ?>';">Back</button>
 </body>
 </html>

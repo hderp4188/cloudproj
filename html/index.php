@@ -34,7 +34,8 @@ include_once("/var/www/inc/dbinfo.inc");
                 if (result === 'duplicate') {
                     alert('Username already exists. Please choose a different username.');
 		} else {	
-                    // If unique, submit the form programmatically
+
+			// If unique, submit the form programmatically
                     this.submit();
                 }
             };
