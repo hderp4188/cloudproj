@@ -24,18 +24,17 @@ try {
         // Check if there's another user in the same chatroom
         $result = $conn->query("SELECT username FROM users WHERE chatroom_id = '$chatroom_id'");
         if ($result->num_rows == 1) {
-            // If there's another user, first delete all messages associated with the chatroom
-            $conn->query("DELETE FROM chat_messages WHERE chatroom_id = '$chatroom_id'");
-
-            // Assign them a new chatroom_id
+            // If there's another user, assign them a new chatroom_id
             $newChatroomId = uniqid('chatroom_');
             $otherUser = $result->fetch_assoc()['username'];
 
             // Update chatroom_id for the remaining user in users table
             $conn->query("UPDATE users SET chatroom_id = '$newChatroomId' WHERE username = '$otherUser'");
 
+            // Update chatroom_id in chat_messages table
+            $conn->query("UPDATE chat_messages SET chatroom_id = '$newChatroomId' WHERE chatroom_id = '$chatroom_id'");
         } elseif ($result->num_rows == 0) {
-            // If no other user is in the chatroom, proceed to delete all messages
+            // If no other user is in the chatroom, delete all messages associated with the chatroom
             $conn->query("DELETE FROM chat_messages WHERE chatroom_id = '$chatroom_id'");
         }
 

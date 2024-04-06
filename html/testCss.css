@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+* {
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Styling the main container */
+.container {
+    width: 80%;
+    margin: auto;
+    letter-spacing: 0.5px;
+    height: 100%;
+}
+
+/* This is the header at the top, containing username */
+.chat-header {
+    border: 1px solid #ccc;
+    width: 100%;
+    height: 10%;
+    display: inline-block;
+    background-color: #efefef;
+    margin: 0;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+/* Username Title, for chat header */
+.usernameTitle {
+    width: auto;
+    float: left;
+    color: black;
+    font-weight: bold;
+    margin: 0 0 0 1%;
+    height: 5%; 
+}
+
+/* Styling the chat container */
+.chat-container {
+    padding: 0 0 50px 0;
+}
+
+/* Styling the messages container */
+.messages-container {
+    border: 1px solid #ccc;
+    overflow: hidden;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 10px 15px 0 15px;
+    background-color: #3d3d3d;
+}
+.msg-page {
+    height: 75vh;
+    overflow-y: auto;
+
+    /* Remove Scrollbar */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.msg-page::-webkit-scrollbar {
+    /* Remove Scrollbar for Chrome, Safari & Opera*/
+    display: none;
+}
+
+/* Styling the write-message-container that is where user can input text */
+.write-message-container {
+    position: relative;
+    height: 11%;
+    background-color: rgb(239 239 239);
+}
+
+
+/* =====
+    Styling the message input field 
+===== */
+/* Input Group for the message */
+.input-group {
+    float: right;
+    margin-bottom: 1vh;
+    outline: none !important;
+    border-radius: 10px;
+    width: 100% !important;
+    background-color: #fff;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+.input-group > .form-control {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    margin-bottom: 0;
+    border: none !important;
+    border-radius: 20px !important;
+    display: block;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+/* Send Button */
+.input-group-text {
+    background: transparent !important;
+    border: none !important;
+    display: flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    margin-bottom: 0;
+    font-size: 1.5rem;
+    font-weight: b;
+    line-height: 1.5;
+    color: #495057;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    font-weight: bold !important;
+    cursor: pointer;
+}
+input:focus {
+    outline: none;
+    border: none !important;
+    box-shadow: none !important;
+}
+.send-icon {
+    font-weight: bold !important;
+}
+
+/* === RIGHT SIDE MESSAGES === */
+.chat_right_msg {
+    overflow: hidden;
+    margin: 25, 20;
+}
+.chat_right_msg p {
+    background-color: #3a12ff;
+    background-image: linear-gradient(45deg, #ff0077 0%, #0f1669 100%);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 1em;
+    padding: 5px 10px 5px 12px;
+    width: 100%;
+    min-width: 10vw;
+    max-width: 50vw;
+    padding: 1rem;
+    box-shadow: rgb(0 0 0 / 25%) 0px 2px 5px 2px;
+}
+.chat_right_blob {
+    float: right;
+}
+
+/* === LEFT SIDE MESSAGES === */
+.chat_left_msg {
+    overflow: hidden;
+}
+.chat_left_msg p {
+    background: #efefef none repeat scroll 0 0;
+    color: #646464;
+    border-radius: 10px;
+    font-size: 1em;
+    padding: 5px 10px 5px 12px;
+    width: 100%;
+    min-width: 10vw;
+    max-width: 50vw;
+    padding: 1rem;
+    margin-left: 1rem;
+    box-shadow: rgb(0 0 0 / 25%) 0px 5px 5px 2px;
+}
+.chat_left_blob {
+    float: left;
+}
+
+@media only screen and (max-device-width: 1000px) {
+    *,
+    .time {
+        font-size: 2em;
+    }
+    .msg-header {
+        height: 5%;
+    }
+    .msg-page {
+        max-height: none;
+    }
+    .received-msg-inbox p {
+        font-size: 2em;
+    }
+    .outgoing-chats-msg p {
+        font-size: 2em;
+    }
+}
+
+@media only screen and (max-device-width: 450px) {
+    *,
+    .time {
+        font-size: 28px;
+    }
+    .msg-header {
+        height: 5%;
+    }
+    .msg-page {
+        max-height: none;
+    }
+    .received-msg-inbox p {
+        font-size: 28px;
+    }
+    .outgoing-chats-msg p {
+        font-size: 28px;
+    }
+}
