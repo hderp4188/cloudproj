@@ -42,7 +42,7 @@
             
             var num1 = Math.floor(Math.random() * nouns.length);
             var num2 = Math.floor(Math.random() * adjs.length);
-            var str = adjs[num1] + nouns[num2] + (num1 * num2);
+            var str = adjs[num1] + nouns[num2] + Math.floor(Math.random() * 999);
 
             input.value = str;
         }
