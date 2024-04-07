@@ -51,7 +51,7 @@
     background-color: #3d3d3d;
 }
 .msg-page {
-    height: 75vh;
+    height: 75%;
     overflow-y: auto;
 
     /* Remove Scrollbar */
@@ -68,8 +68,8 @@
     visibility: visible; /* Override any hidden property */
     z-index: 1000; /* Ensure it is above other elements */
     position: relative;
-    height: 11%;
-    background-color: rgb(239 239 239);
+    /*height: 7.5%;
+    background-color: rgb(239 239 239);*/
 }
 
 
@@ -179,8 +179,8 @@ input:focus {
 /* Positioning the back-button-container at the bottom right of the screen */
 .back-button-container {
     position: fixed; /* Fixed positioning relative to the viewport */
-    bottom: 10px;   /* 10px from the bottom */
-    right: 10px;    /* 10px from the right */
+    bottom: 3vh;    /* 3vh from the bottom */
+    right: 3vh;     /* 3vh from the right */
     z-index: 1001;  /* Ensures it stays on top of other elements */
 }
 
