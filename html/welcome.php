@@ -168,11 +168,32 @@ if (!empty($username)) {
         .catch(error => console.error('Error checking chatroom ID:', error));
     }    
 
+    function updateChatPartnerUsername() {
+        var username = "<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>";
+        var chatroom_id = "<?php echo $chatroom_id; ?>";
+
+        fetch('get_chat_partner.php?username=' + encodeURIComponent(username) + '&chatroom_id=' + encodeURIComponent(chatroom_id))
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("chatPartnerUsername").innerText = "You are talking to: " + data;
+        })
+        .catch(error => console.error('Error updating chat partner username:', error));
+    }
+
+    document.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent the default action to stop the form from submitting
+            send_on_click(); // Trigger the send button functionality
+        }
+    });
+
+
     // document.addEventListener('DOMContentLoaded', loadMessages); // Load messages when document is ready
     document.addEventListener('DOMContentLoaded', function() {
         loadMessages(); // Load messages when the page is fully loaded
         setInterval(loadMessages, 1000); // Refresh messages every 5 seconds
         setInterval(checkForChatroomIdUpdate, 5000);
+        setInterval(updateChatPartnerUsername, 1000);
     });
 
     </script>
@@ -181,7 +202,9 @@ if (!empty($username)) {
     <div class="container">
         <div class="chat-header">
             <div class="usernameTitle">
-                <p><?php echo "Welcome, $username! Start chatting. Total active users: $userCount"; ?></p>
+                <p><?php echo "Welcome, $username! Start chatting."; ?></p>
+                <p id="chatPartnerUsername">You are talking to: Waiting for someone to join...<</p>
+
             </div>
         </div>
         <div class="chat-container">
