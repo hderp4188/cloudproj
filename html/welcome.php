@@ -62,9 +62,79 @@ if (!empty($username)) {
     <title>Real Time Web Chatting</title>
     <link rel="stylesheet" href="styles_messages.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"/>
-    <script>
-        var username = "<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>"; // Define username globally
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+<script>
+  
+	var username = "<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>"; // Define username globally
+	function encryptVigenere(inputString,newkey) {
+            const key = newkey.toUpperCase().replace(/[^A-Za-z]/g, '');
+            let encryptedText = '';
 
+            // Iterate over each character in the input string
+            for (let i = 0, j = 0; i < inputString.length; i++) {
+                const currentChar = inputString[i];
+                let baseCharCode = currentChar >= 'a' && currentChar <= 'z' ? 'a'.charCodeAt(0) : 'A'.charCodeAt(0);
+
+                if ((currentChar >= 'A' && currentChar <= 'Z') || (currentChar >= 'a' && currentChar <= 'z')) {
+                    // Encrypt alphabetic characters
+                    const encryptedChar = String.fromCharCode(
+                        ((currentChar.charCodeAt(0) - baseCharCode) +
+                        (key[j % key.length].charCodeAt(0) - 'A'.charCodeAt(0))) % 26 +
+                        baseCharCode
+                    );
+                    encryptedText += encryptedChar;
+                    j++; // Move to the next letter in the key
+                } else {
+                    // Non-alphabetic characters are added directly
+                    encryptedText += currentChar;
+                }
+            }
+            return encryptedText;
+        }
+
+        function getFixedSaltFromString(str) {
+            // var newstr = encryptVigenere(str);
+            return new TextEncoder().encode(str);
+	}
+	function encrypt(inputstring,pass){
+		var message = encryptVigenere(inputstring,pass);
+		var encryptedd = CryptoJS.AES.encrypt(message, pass).toString();
+		return encryptedd;
+	
+	}
+	function decrypt(inputstring,pass){
+                
+                var decryptedd = CryptoJS.AES.decrypt(inputstring, pass).toString(CryptoJS.enc.Utf8);
+		var message = decryptVigenere(decryptedd,pass);
+		return message;
+
+        }
+        
+        function decryptVigenere(encryptedText,decryptkey) {
+            const key = decryptkey.toUpperCase().replace(/[^A-Za-z]/g, '');
+            let decryptedText = '';
+
+            for (let i = 0, j = 0; i < encryptedText.length; i++) {
+                const currentChar = encryptedText[i];
+                let baseCharCode = currentChar >= 'a' && currentChar <= 'z' ? 'a'.charCodeAt(0) : 'A'.charCodeAt(0);
+
+                if ((currentChar >= 'A' && currentChar <= 'Z') || (currentChar >= 'a' && currentChar <= 'z')) {
+                    // Decrypt alphabetic characters
+                    const decryptedChar = String.fromCharCode(
+                        ((currentChar.charCodeAt(0) - baseCharCode) -
+                        (key[j % key.length].charCodeAt(0) - 'A'.charCodeAt(0)) + 26) % 26 +
+                        baseCharCode
+                    );
+                    decryptedText += decryptedChar;
+                    j++; // Move to the next letter in the key
+                } else {
+                    // Non-alphabetic characters are added directly
+                    decryptedText += currentChar;
+                }
+            }
+            return decryptedText;
+        }
+        
     function set_chat() {
         var element = document.getElementById("chatlog");
         element.scrollTop = element.scrollHeight;
@@ -81,9 +151,10 @@ if (!empty($username)) {
         const msg = document.getElementById('messageInput').value;
         var words = msg.split(/\s+/); // Split by one or more whitespace
         var filteredText = FilterProfanity(words); // First, filter profanity
-
+	var roomkey= "<?php echo $chatroom_id; ?>";
         // document.getElementById('output').textContent = `${filteredText}`;
-        return filteredText;
+	var encryptedtext= encrypt(filteredText,roomkey);
+	return encryptedtext;
     }
 
     function FilterProfanity(words) {
@@ -145,8 +216,8 @@ if (!empty($username)) {
                 var blob = document.createElement('div');
                 blob.className = message.sender === username ? 'chat_right_blob' : 'chat_left_blob';
                 var p = document.createElement('p');
-                p.textContent = message.message;
-                blob.appendChild(p);
+                p.textContent = decrypt(message.message,chatroom_id);
+		blob.appendChild(p);
                 div.appendChild(blob);
                 chatlog.appendChild(div);
             });
